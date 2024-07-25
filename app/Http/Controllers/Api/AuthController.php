@@ -3,36 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        try 
-        {
-            $validateuser = Validator::make($request->all(), [
-                'name' => 'required|string|max:50',
-                'email' => 'required|email|unique:users,email',
-                'password' => 'required|string|min:6',
-                'is_admin' => 'required|boolean'
-            ]);
-
-            if($validateuser->fails()){
-                return response()->json([
-                    'status' => false,
-                    'message'=> 'Validation error',
-                    'errors'=> $validateuser->errors()
-                ], 401);
-            }
-
+        try {
             $user = User::create([
                 'name' => $request->name,
-                'email' => $request->email, 
+                'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'is_admin' => $request->is_admin,
             ]);
@@ -40,38 +25,24 @@ class AuthController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'User created successfully',
-                'token' => $user->createToken("API TOKEN")->plainTextToken
+                'token' => $user->createToken("API TOKEN")->plainTextToken,
+                'user' => new UserResource($user)
             ], 201);
-        } catch (\Throwable $th){
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message'=> $th->getMessage(),
+                'message' => $th->getMessage(),
             ], 500);
         }
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        try 
-        {
-            $validateuser = Validator::make($request->all(), [
-                'email' => 'required|email',
-                'password' => 'required'
-                //'_token' => 'required|string'
-            ]);
-
-            if($validateuser->fails()){
+        try {
+            if (!Auth::attempt($request->only(['email', 'password']))) {
                 return response()->json([
                     'status' => false,
-                    'message'=> 'Validation error',
-                    'errors'=> $validateuser->errors()
-                ], 401);
-            }
-
-            if(!Auth::attempt($request->only(['email', 'password']))){
-                return response()->json([
-                    'status' => false,
-                    'message'=> 'Email & password do not match our records'
+                    'message' => 'Email & password do not match our records'
                 ], 401);
             }
 
@@ -79,24 +50,23 @@ class AuthController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'User logged in successfully',
-                'token' => $user->createToken("API TOKEN")->plainTextToken
+                'token' => $user->createToken("API TOKEN")->plainTextToken,
+                'user' => new UserResource($user)
             ], 201);
-        } catch (\Throwable $th){
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message'=> $th->getMessage(),
+                'message' => $th->getMessage(),
             ], 500);
         }
     }
 
-    public function profile()
+    public function user()
     {
-        $userData = auth()->user();
         return response()->json([
             'status' => true,
-            'message' => 'Profile Information',
-            'data' => $userData,
-            'id' => auth()->user()->id
+            'message' => 'Profile Login',
+            'data' => new UserResource(auth()->user())
         ], 200);
     }
 
@@ -108,10 +78,5 @@ class AuthController extends Controller
             'message' => 'User logged out',
             'data' => []
         ], 200);
-    }
-
-    public function user(Request $request)
-    {
-        return $request->user();
     }
 }

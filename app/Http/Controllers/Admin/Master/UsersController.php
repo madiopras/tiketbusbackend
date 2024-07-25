@@ -1,45 +1,44 @@
 <?php
 
+// UsersController.php
 namespace App\Http\Controllers\Admin\Master;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 
 class UsersController extends Controller
 {
-    // Get all users
+    
+
     public function index(Request $request)
     {
         try {
-            $query = User::query();
+            $filters = $request->only(['name', 'phone_number', 'email', 'gender', 'role', 'is_active']);
+            $limit = $request->query('limit', 10);
+            $page = $request->query('page', 1);
 
-            if ($request->has('name')) {
-                $query->where('name', 'like', '%' . $request->query('name') . '%');
-            }
+            $users = User::filter($filters)->paginate($limit, ['*'], 'page', $page);
 
-            if ($request->has('phone_number')) {
-                $query->where('phone_number', 'like', '%' . $request->query('phone_number') . '%');
-            }
-
-            $users = $query->get();
-            return response()->json($users, 200);
+            return response()->json([
+                'status' => true,
+                'data' => $users->items(),
+                'current_page' => $users->currentPage(),
+                'total_pages' => $users->lastPage(),
+                'total_items' => $users->total()
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to fetch users', 'error' => $e->getMessage()], 500);
         }
     }
 
-    // Get a single user
     public function show($id)
     {
         try {
-            $user = User::find($id);
-
-            if (!$user) {
-                return response()->json(['message' => 'User not found'], 404);
-            }
+            $user = User::findOrFail($id);
 
             return response()->json($user, 200);
         } catch (\Exception $e) {
@@ -47,23 +46,8 @@ class UsersController extends Controller
         }
     }
 
-    // Create a new user
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'phone_number' => 'nullable|string|max:20',
-            'gender' => 'nullable|string|max:10',
-            'role' => 'required|string|max:255',
-            'is_active' => 'required|boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
-        }
-
         try {
             $user = User::create([
                 'name' => $request->name,
@@ -83,27 +67,12 @@ class UsersController extends Controller
         }
     }
 
-    // Update an existing user
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
         $user = User::find($id);
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'sometimes|string|min:8',
-            'phone_number' => 'nullable|string|max:20',
-            'gender' => 'nullable|string|max:10',
-            'role' => 'sometimes|string|max:255',
-            'is_active' => 'sometimes|boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
         }
 
         try {
@@ -122,7 +91,6 @@ class UsersController extends Controller
         }
     }
 
-    // Delete a user
     public function destroy($id)
     {
         try {

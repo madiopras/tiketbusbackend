@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -40,7 +39,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -52,11 +51,47 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Scope a query to filter users based on given filters.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param array $filters
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeFilter($query, $filters)
+    {
+        if (isset($filters['name'])) {
+            $query->where('name', 'like', '%' . $filters['name'] . '%');
+        }
+        if (isset($filters['phone_number'])) {
+            $query->where('phone_number', 'like', '%' . $filters['phone_number'] . '%');
+        }
+        if (isset($filters['email'])) {
+            $query->where('email', 'like', '%' . $filters['email'] . '%');
+        }
+        if (isset($filters['gender'])) {
+            $query->where('gender', 'like', '%' . $filters['gender'] . '%');
+        }
+        if (isset($filters['role'])) {
+            $query->where('role', 'like', '%' . $filters['role'] . '%');
+        }
+        if (isset($filters['is_active'])) {
+            $isActiveValue = $filters['is_active'] === 'true' ? 1 : ($filters['is_active'] === 'false' ? 0 : '');
+            $query->where('is_active', 'like', '%' . $isActiveValue . '%');
+        }
+    }
+
+    /**
+     * Get the user who created this user.
+     */
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by_id');
     }
 
+    /**
+     * Get the user who updated this user.
+     */
     public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by_id');
