@@ -11,9 +11,11 @@ class BusResource extends JsonResource
         return [
             'id' => $this->id,
             'bus_number' => $this->bus_number,
+            'type_bus' => $this->type_bus,
             'capacity' => $this->capacity,
             'operator_name' => $this->operator_name,
             'class_id' => $this->class_id,
+            'description' => $this->description,
             'is_active' => $this->is_active,
             'created_by_id' => $this->created_by_id,
             'updated_by_id' => $this->updated_by_id,

@@ -15,7 +15,7 @@ class BusesController extends Controller
     public function index(Request $request)
     {
         try {
-            $filters = $request->only(['bus_number', 'operator_name', 'class_name', 'is_active']);
+            $filters = $request->only(['bus_number', 'type_bus', 'class_name', 'operator_name', 'is_active']);
             $limit = $request->query('limit', 10);
             $page = $request->query('page', 1);
 
@@ -51,9 +51,11 @@ class BusesController extends Controller
     try {
         $bus = Buses::create([
             'bus_number' => $request->bus_number,
+            'type_bus' => $request->type_bus,
             'capacity' => $request->capacity,
             'operator_name' => $request->operator_name,
             'class_id' => $request->class_id,
+            'description' => $request->description,
             'is_active' => $request->is_active,
             'created_by_id' => $request->user()->id,
             'updated_by_id' => $request->user()->id,
@@ -86,9 +88,11 @@ public function update(UpdateBusRequest $request, $id)
         $bus = Buses::findOrFail($id);
         $bus->update([
             'bus_number' => $request->bus_number,
+            'type_bus' => $request->type_bus,
             'capacity' => $request->capacity,
             'operator_name' => $request->operator_name,
             'class_id' => $request->class_id,
+            'description' => $request->description,
             'is_active' => $request->is_active,
             'updated_by_id' => $request->user()->id,
         ]);

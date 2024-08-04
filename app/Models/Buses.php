@@ -14,9 +14,11 @@ class Buses extends Model
 
     protected $fillable = [
         'bus_number',
+        'type_bus',
         'capacity',
         'operator_name',
         'class_id',
+        'description',
         'is_active',
         'created_by_id',
         'updated_by_id',
@@ -31,7 +33,7 @@ class Buses extends Model
     // Fungsi scope untuk memfilter data
     public function scopeFilterWithJoin($query, $filters)
     {
-        $query->select('buses.id', 'buses.bus_number', 'classes.class_name', 'buses.capacity', 'buses.operator_name')
+        $query->select('buses.id', 'buses.bus_number', 'buses.type_bus', 'classes.class_name', 'buses.capacity', 'buses.operator_name')
               ->join('classes', 'buses.class_id', '=', 'classes.id')
               ->orderBy('buses.bus_number', 'asc');
 
@@ -44,8 +46,12 @@ class Buses extends Model
         if (isset($filters['class_name'])) {
             $query->where('classes.class_name', 'like', '%' . $filters['class_name'] . '%');
         }
+        if (isset($filters['type_bus'])) {
+            $query->where('buses.type_bus', 'like', '%' . $filters['type_bus'] . '%');
+        }
         if (isset($filters['is_active'])) {
-            $query->where('buses.is_active', $filters['is_active']);
+            $isActiveValue = $filters['is_active'] === 'true' ? 1 : ($filters['is_active'] === 'false' ? 0 : '');
+            $query->where('is_active', 'like', '%' . $isActiveValue . '%');
         }
         
         return $query;
