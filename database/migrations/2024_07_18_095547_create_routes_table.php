@@ -14,7 +14,7 @@ class CreateRoutesTable extends Migration
     public function up()
     {
         Schema::create('routes', function (Blueprint $table) {
-            $table->id('route_id');
+            $table->id('id');
             $table->integer('start_location_id');
             $table->integer('end_location_id');
             $table->float('distance');

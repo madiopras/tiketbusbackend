@@ -15,7 +15,7 @@ class BusesController extends Controller
     public function index(Request $request)
     {
         try {
-            $filters = $request->only(['bus_number', 'type_bus', 'class_name', 'operator_name', 'is_active']);
+            $filters = $request->only(['bus_number', 'type_bus', 'class_name', 'bus_name', 'is_active']);
             $limit = $request->query('limit', 10);
             $page = $request->query('page', 1);
 
@@ -53,7 +53,7 @@ class BusesController extends Controller
             'bus_number' => $request->bus_number,
             'type_bus' => $request->type_bus,
             'capacity' => $request->capacity,
-            'operator_name' => $request->operator_name,
+            'bus_name' => $request->bus_name,
             'class_id' => $request->class_id,
             'description' => $request->description,
             'is_active' => $request->is_active,
@@ -90,7 +90,7 @@ public function update(UpdateBusRequest $request, $id)
             'bus_number' => $request->bus_number,
             'type_bus' => $request->type_bus,
             'capacity' => $request->capacity,
-            'operator_name' => $request->operator_name,
+            'bus_name' => $request->bus_name,
             'class_id' => $request->class_id,
             'description' => $request->description,
             'is_active' => $request->is_active,

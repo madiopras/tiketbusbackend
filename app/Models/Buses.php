@@ -16,7 +16,7 @@ class Buses extends Model
         'bus_number',
         'type_bus',
         'capacity',
-        'operator_name',
+        'bus_name',
         'class_id',
         'description',
         'is_active',
@@ -33,15 +33,15 @@ class Buses extends Model
     // Fungsi scope untuk memfilter data
     public function scopeFilterWithJoin($query, $filters)
     {
-        $query->select('buses.id', 'buses.bus_number', 'buses.type_bus', 'classes.class_name', 'buses.capacity', 'buses.operator_name')
+        $query->select('buses.id', 'buses.bus_number', 'buses.type_bus', 'classes.class_name', 'buses.capacity', 'buses.bus_name')
               ->join('classes', 'buses.class_id', '=', 'classes.id')
               ->orderBy('buses.bus_number', 'asc');
 
         if (isset($filters['bus_number'])) {
             $query->where('buses.bus_number', 'like', '%' . $filters['bus_number'] . '%');
         }
-        if (isset($filters['operator_name'])) {
-            $query->where('buses.operator_name', 'like', '%' . $filters['operator_name'] . '%');
+        if (isset($filters['bus_name'])) {
+            $query->where('buses.bus_name', 'like', '%' . $filters['bus_name'] . '%');
         }
         if (isset($filters['class_name'])) {
             $query->where('classes.class_name', 'like', '%' . $filters['class_name'] . '%');

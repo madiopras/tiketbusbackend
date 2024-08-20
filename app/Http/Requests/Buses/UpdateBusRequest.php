@@ -25,7 +25,7 @@ class UpdateBusRequest extends FormRequest
             'bus_number' => 'required|string|max:255',
             'type_bus' => 'required|string|max:255',
             'capacity' => 'required|integer',
-            'operator_name' => 'required|string|max:255',
+            'bus_name' => 'required|string|max:255',
             'class_id' => 'required|integer',
             'description' => 'required|string|max:255',
             'is_active' => 'required|boolean',

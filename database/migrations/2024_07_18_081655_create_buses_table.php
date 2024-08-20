@@ -14,10 +14,10 @@ class CreateBusesTable extends Migration
     public function up()
     {
         Schema::create('buses', function (Blueprint $table) {
-            $table->id('bus_id');
+            $table->id('id');
             $table->string('bus_number');
             $table->integer('capacity');
-            $table->string('operator_name');
+            $table->string('bus_name');
             $table->integer('class_id');
             $table->boolean('is_active');
             $table->integer('created_by_id');

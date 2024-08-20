@@ -14,7 +14,7 @@ class CreateSeatsTable extends Migration
     public function up()
     {
         Schema::create('seats', function (Blueprint $table) {
-            $table->id('seat_id');
+            $table->id('id');
             $table->integer('bus_id');
             $table->string('seat_number');
             $table->integer('created_by_id');

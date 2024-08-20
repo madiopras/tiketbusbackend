@@ -14,7 +14,7 @@ class CreateClassesTable extends Migration
     public function up()
     {
         Schema::create('classes', function (Blueprint $table) {
-            $table->id('class_id');
+            $table->id('id');
             $table->string('class_name');
             $table->text('description')->nullable();
             $table->boolean('has_ac')->default(false);

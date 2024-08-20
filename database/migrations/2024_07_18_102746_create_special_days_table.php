@@ -14,7 +14,7 @@ class CreateSpecialDaysTable extends Migration
     public function up()
     {
         Schema::create('special_days', function (Blueprint $table) {
-            $table->id('special_day_id');
+            $table->id('id');
             $table->dateTime('start_date');
             $table->dateTime('end_date');
             $table->string('description');
