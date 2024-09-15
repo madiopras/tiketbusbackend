@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin\Master;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreLocationRequest;
-use App\Http\Requests\UpdateLocationRequest;
-use App\Models\Location;
+use App\Http\Requests\Locations\StoreLocationRequest;
+use App\Http\Requests\Locations\UpdateLocationRequest;
+use App\Models\Locations;
 use Illuminate\Http\Request;
 
-class LocationController extends Controller
+class LocationsController extends Controller
 {
     public function index(Request $request)
     {
@@ -17,7 +17,7 @@ class LocationController extends Controller
             $limit = $request->query('limit', 10);
             $page = $request->query('page', 1);
 
-            $locations = Location::filter($filters)->paginate($limit, ['*'], 'page', $page);
+            $locations = Locations::filter($filters)->paginate($limit, ['*'], 'page', $page);
 
             return response()->json([
                 'status' => true,
@@ -34,7 +34,7 @@ class LocationController extends Controller
     public function show($id)
     {
         try {
-            $location = Location::findOrFail($id);
+            $location = Locations::findOrFail($id);
 
             return response()->json($location, 200);
         } catch (\Exception $e) {
@@ -45,7 +45,7 @@ class LocationController extends Controller
     public function store(StoreLocationRequest $request)
     {
         try {
-            $location = Location::create([
+            $location = Locations::create([
                 'name' => $request->name,
                 'address' => $request->address,
                 'created_by_id' => $request->user()->id,
@@ -60,7 +60,7 @@ class LocationController extends Controller
 
     public function update(UpdateLocationRequest $request, $id)
     {
-        $location = Location::find($id);
+        $location = Locations::find($id);
 
         if (!$location) {
             return response()->json(['message' => 'Location not found'], 404);
@@ -81,7 +81,7 @@ class LocationController extends Controller
     public function destroy($id)
     {
         try {
-            $location = Location::find($id);
+            $location = Locations::find($id);
 
             if (!$location) {
                 return response()->json(['message' => 'Location not found'], 404);

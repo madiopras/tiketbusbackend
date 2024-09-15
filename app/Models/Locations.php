@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class Location extends Model
+class Locations extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 

@@ -6,7 +6,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Admin\Master\UsersController;
 use App\Http\Controllers\Admin\Master\ClassesController; // Tambahkan ini
 use App\Http\Controllers\Admin\Master\BusesController; // Tambahkan ini
-
+use App\Http\Controllers\Admin\Master\LocationsController;
+use App\Http\Controllers\Admin\Master\RoutesController;
 
 // Register and Login
 Route::post('register', [AuthController::class, 'register']);
@@ -23,5 +24,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::apiResource('users', UsersController::class);
         Route::apiResource('classes', ClassesController::class); // Tambahkan ini
         Route::apiResource('busses', BusesController::class); // Tambahkan ini
+        Route::apiResource('locations', LocationsController::class); // Tambahkan ini
+        Route::apiResource('routes', RoutesController::class); // Tambahkan ini
     });
 });

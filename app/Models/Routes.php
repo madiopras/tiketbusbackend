@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class Route extends Model
+class Routes extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -37,32 +37,26 @@ class Route extends Model
         'updated_at' => 'datetime',
     ];
 
-    /**
-     * Scope a query to filter routes based on given filters.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filters
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeFilter($query, $filters)
+    
+    public function scopeFilterWithJoin($query, $filters)
     {
-        if (isset($filters['start_location_id'])) {
-            $query->where('start_location_id', $filters['start_location_id']);
+        $query->select('r.id', 'l1.name as start_location', 'l2.name as end_location', 'r.distance', 'r.price')
+            ->from('routes as r')
+            ->join('locations as l1', 'r.start_location_id', '=', 'l1.id')
+            ->join('locations as l2', 'r.end_location_id', '=', 'l2.id')
+            ->orderBy('l1.name', 'asc'); // Atau Anda bisa mengganti 'r.id' dengan kolom lain yang ingin Anda urutkan
+
+        if (isset($filters['start_location'])) {
+            $query->where('l1.name', 'like', '%' . $filters['start_location'] . '%');
         }
-        if (isset($filters['end_location_id'])) {
-            $query->where('end_location_id', $filters['end_location_id']);
+        if (isset($filters['end_location'])) {
+            $query->where('l2.name', 'like', '%' . $filters['end_location'] . '%');
         }
         if (isset($filters['distance'])) {
             $query->where('distance', $filters['distance']);
         }
         if (isset($filters['price'])) {
             $query->where('price', $filters['price']);
-        }
-        if (isset($filters['created_by_id'])) {
-            $query->where('created_by_id', $filters['created_by_id']);
-        }
-        if (isset($filters['updated_by_id'])) {
-            $query->where('updated_by_id', $filters['updated_by_id']);
         }
     }
 
@@ -71,7 +65,7 @@ class Route extends Model
      */
     public function startLocation()
     {
-        return $this->belongsTo(Location::class, 'start_location_id');
+        return $this->belongsTo(Locations::class, 'start_location_id');
     }
 
     /**
@@ -79,7 +73,7 @@ class Route extends Model
      */
     public function endLocation()
     {
-        return $this->belongsTo(Location::class, 'end_location_id');
+        return $this->belongsTo(Locations::class, 'end_location_id');
     }
 
     /**

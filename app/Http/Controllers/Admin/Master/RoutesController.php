@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin\Master;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreRouteRequest;
-use App\Http\Requests\UpdateRouteRequest;
-use App\Models\Route;
+use App\Http\Requests\Routes\StoreRouteRequest;
+use App\Http\Requests\Routes\UpdateRouteRequest;
+use App\Models\Routes;
 use Illuminate\Http\Request;
 
 class RoutesController extends Controller
@@ -13,11 +13,11 @@ class RoutesController extends Controller
     public function index(Request $request)
     {
         try {
-            $filters = $request->only(['start_location_id', 'end_location_id', 'distance', 'price', 'created_by_id', 'updated_by_id']);
+            $filters = $request->only(['start_location', 'end_location', 'distance', 'price']);
             $limit = $request->query('limit', 10);
             $page = $request->query('page', 1);
 
-            $routes = Route::filter($filters)->paginate($limit, ['*'], 'page', $page);
+            $routes = Routes::filterWithJoin($filters)->paginate($limit, ['*'], 'page', $page);
 
             return response()->json([
                 'status' => true,
@@ -34,7 +34,7 @@ class RoutesController extends Controller
     public function show($id)
     {
         try {
-            $route = Route::findOrFail($id);
+            $route = Routes::findOrFail($id);
 
             return response()->json($route, 200);
         } catch (\Exception $e) {
@@ -45,7 +45,7 @@ class RoutesController extends Controller
     public function store(StoreRouteRequest $request)
     {
         try {
-            $route = Route::create([
+            $route = Routes::create([
                 'start_location_id' => $request->start_location_id,
                 'end_location_id' => $request->end_location_id,
                 'distance' => $request->distance,
@@ -62,7 +62,7 @@ class RoutesController extends Controller
 
     public function update(UpdateRouteRequest $request, $id)
     {
-        $route = Route::find($id);
+        $route = Routes::find($id);
 
         if (!$route) {
             return response()->json(['message' => 'Route not found'], 404);
@@ -83,7 +83,7 @@ class RoutesController extends Controller
     public function destroy($id)
     {
         try {
-            $route = Route::find($id);
+            $route = Routes::find($id);
 
             if (!$route) {
                 return response()->json(['message' => 'Route not found'], 404);
