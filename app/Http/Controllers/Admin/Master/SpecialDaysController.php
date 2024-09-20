@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin\Master;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreSpecialDayRequest;
-use App\Http\Requests\UpdateSpecialDayRequest;
-use App\Models\SpecialDay;
+use App\Http\Requests\SpecialDays\StoreSpecialDaysRequest;
+use App\Http\Requests\SpecialDays\UpdateSpecialDaysRequest;
+use App\Models\SpecialDays;
 use Illuminate\Http\Request;
 
 class SpecialDaysController extends Controller
@@ -13,11 +13,11 @@ class SpecialDaysController extends Controller
     public function index(Request $request)
     {
         try {
-            $filters = $request->only(['start_date', 'end_date', 'description', 'price_percentage', 'is_increase', 'is_active', 'created_by_id', 'updated_by_id']);
+            $filters = $request->only(['name', 'start_date', 'end_date', 'description', 'price_percentage', 'is_increase', 'is_active', 'created_by_id', 'updated_by_id']);
             $limit = $request->query('limit', 10);
             $page = $request->query('page', 1);
 
-            $specialDays = SpecialDay::filter($filters)->paginate($limit, ['*'], 'page', $page);
+            $specialDays = SpecialDays::filter($filters)->paginate($limit, ['*'], 'page', $page);
 
             return response()->json([
                 'status' => true,
@@ -34,7 +34,7 @@ class SpecialDaysController extends Controller
     public function show($id)
     {
         try {
-            $specialDay = SpecialDay::findOrFail($id);
+            $specialDay = SpecialDays::findOrFail($id);
 
             return response()->json($specialDay, 200);
         } catch (\Exception $e) {
@@ -42,10 +42,11 @@ class SpecialDaysController extends Controller
         }
     }
 
-    public function store(StoreSpecialDayRequest $request)
+    public function store(StoreSpecialDaysRequest $request)
     {
         try {
-            $specialDay = SpecialDay::create([
+            $specialDay = SpecialDays::create([
+                'name' => $request->name,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'description' => $request->description,
@@ -62,16 +63,16 @@ class SpecialDaysController extends Controller
         }
     }
 
-    public function update(UpdateSpecialDayRequest $request, $id)
+    public function update(UpdateSpecialDaysRequest $request, $id)
     {
-        $specialDay = SpecialDay::find($id);
+        $specialDay = SpecialDays::find($id);
 
         if (!$specialDay) {
             return response()->json(['message' => 'Special day not found'], 404);
         }
 
         try {
-            $specialDay->update($request->only(['start_date', 'end_date', 'description', 'price_percentage', 'is_increase', 'is_active']));
+            $specialDay->update($request->only(['name', 'start_date', 'end_date', 'description', 'price_percentage', 'is_increase', 'is_active']));
 
             $specialDay->updated_by_id = $request->user()->id;
             $specialDay->save();
@@ -85,7 +86,7 @@ class SpecialDaysController extends Controller
     public function destroy($id)
     {
         try {
-            $specialDay = SpecialDay::find($id);
+            $specialDay = SpecialDays::find($id);
 
             if (!$specialDay) {
                 return response()->json(['message' => 'Special day not found'], 404);

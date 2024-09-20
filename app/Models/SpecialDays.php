@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class SpecialDay extends Model
+class SpecialDays extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -17,6 +17,7 @@ class SpecialDay extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'name',
         'start_date',
         'end_date',
         'description',
@@ -51,6 +52,9 @@ class SpecialDay extends Model
      */
     public function scopeFilter($query, $filters)
     {
+        if (isset($filters['name'])) {
+            $query->where('name', 'like', '%' . $filters['name'] . '%');
+        }
         if (isset($filters['start_date'])) {
             $query->where('start_date', '>=', $filters['start_date']);
         }

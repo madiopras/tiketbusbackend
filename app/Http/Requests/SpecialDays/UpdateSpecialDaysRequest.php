@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\SpecialDays;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateSpecialDayRequest extends FormRequest
+class UpdateSpecialDaysRequest extends FormRequest
 {
     public function authorize()
     {
@@ -14,6 +14,7 @@ class UpdateSpecialDayRequest extends FormRequest
     public function rules()
     {
         return [
+            'name' => 'required|string|max:255',
             'start_date' => 'sometimes|required|date',
             'end_date' => 'sometimes|required|date',
             'description' => 'sometimes|required|string|max:255',
