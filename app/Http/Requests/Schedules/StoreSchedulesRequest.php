@@ -15,10 +15,8 @@ class StoreScheduleRequest extends FormRequest
     {
         return [
             'bus_id' => 'required|integer',
-            'route_id' => 'required|integer',
             'departure_time' => 'required|date',
             'arrival_time' => 'required|date',
-            'price' => 'required|numeric',
             'description' => 'required|string|max:255',
         ];
     }

@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 
-class Schedules extends Model
+class ScheduleRute extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -17,23 +17,29 @@ class Schedules extends Model
      * @var array<int, string>
      */
 
+    protected $table = 'schedule_routes';
+
     protected $fillable = [
-        'bus_id',
+        'schedule_id',
+        'route_id',
+        'sequence_route',
         'departure_time',
         'arrival_time',
-        'description',
-        'created_by_id',
-        'updated_by_id',
+        'price_rute',
+        'description'
     ];
 
-    /**
+     /**
      * The attributes that should be cast.
      *
      * @var array<string, string>
      */
-    protected $casts = [
+
+     protected $casts = [
+        'sequence_route' => 'integer',
         'departure_time' => 'datetime',
         'arrival_time' => 'datetime',
+        'price_rute' => 'float',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -45,35 +51,24 @@ class Schedules extends Model
      * @param array $filters
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeFilter($query, $filters)
+
+     public function scopeFilter($query, $filters)
     {
-        if (isset($filters['bus_id'])) {
-            $query->where('bus_id', $filters['bus_id']);
-        }
-        if (isset($filters['departure_time'])) {
-            $query->where('departure_time', '>=', $filters['departure_time']);
-        }
-        if (isset($filters['arrival_time'])) {
-            $query->where('arrival_time', '<=', $filters['arrival_time']);
-        }
         if (isset($filters['description'])) {
-            $query->where('description', 'like', '%' . $filters['description'] . '%');
-        }
-        if (isset($filters['created_by_id'])) {
-            $query->where('created_by_id', $filters['created_by_id']);
-        }
-        if (isset($filters['updated_by_id'])) {
-            $query->where('updated_by_id', $filters['updated_by_id']);
+            $query->where('description', $filters['description']);
         }
     }
 
-    /**
-     * Get the bus associated with the schedule.
-     */
-    public function bus()
+    public function schedule()
     {
-        return $this->belongsTo(Buses::class, 'bus_id');
+        return $this->belongsTo(Schedules::class, 'schedule_id');
     }
+
+    public function route()
+    {
+        return $this->belongsTo(Routes::class, 'route_id');
+    }
+
     /**
      * Get the user who created this schedule.
      */

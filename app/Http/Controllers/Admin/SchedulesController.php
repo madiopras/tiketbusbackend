@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreScheduleRequest;
 use App\Http\Requests\UpdateScheduleRequest;
-use App\Models\Schedule;
+use App\Models\Schedules;
 use Illuminate\Http\Request;
 
 class SchedulesController extends Controller
@@ -13,11 +13,11 @@ class SchedulesController extends Controller
     public function index(Request $request)
     {
         try {
-            $filters = $request->only(['bus_id', 'route_id', 'departure_time', 'arrival_time', 'price', 'description', 'created_by_id', 'updated_by_id']);
+            $filters = $request->only(['bus_id', 'departure_time', 'arrival_time',  'description', 'created_by_id', 'updated_by_id']);
             $limit = $request->query('limit', 10);
             $page = $request->query('page', 1);
 
-            $schedules = Schedule::filter($filters)->paginate($limit, ['*'], 'page', $page);
+            $schedules = Schedules::filter($filters)->paginate($limit, ['*'], 'page', $page);
 
             return response()->json([
                 'status' => true,
@@ -34,7 +34,7 @@ class SchedulesController extends Controller
     public function show($id)
     {
         try {
-            $schedule = Schedule::findOrFail($id);
+            $schedule = Schedules::findOrFail($id);
 
             return response()->json($schedule, 200);
         } catch (\Exception $e) {
@@ -45,12 +45,10 @@ class SchedulesController extends Controller
     public function store(StoreScheduleRequest $request)
     {
         try {
-            $schedule = Schedule::create([
+            $schedule = Schedules::create([
                 'bus_id' => $request->bus_id,
-                'route_id' => $request->route_id,
                 'departure_time' => $request->departure_time,
                 'arrival_time' => $request->arrival_time,
-                'price' => $request->price,
                 'description' => $request->description,
                 'created_by_id' => $request->user()->id,
                 'updated_by_id' => $request->user()->id,
@@ -64,14 +62,14 @@ class SchedulesController extends Controller
 
     public function update(UpdateScheduleRequest $request, $id)
     {
-        $schedule = Schedule::find($id);
+        $schedule = Schedules::find($id);
 
         if (!$schedule) {
             return response()->json(['message' => 'Schedule not found'], 404);
         }
 
         try {
-            $schedule->update($request->only(['bus_id', 'route_id', 'departure_time', 'arrival_time', 'price', 'description']));
+            $schedule->update($request->only(['bus_id', 'departure_time', 'arrival_time',  'description']));
 
             $schedule->updated_by_id = $request->user()->id;
             $schedule->save();
@@ -85,7 +83,7 @@ class SchedulesController extends Controller
     public function destroy($id)
     {
         try {
-            $schedule = Schedule::find($id);
+            $schedule = Schedules::find($id);
 
             if (!$schedule) {
                 return response()->json(['message' => 'Schedule not found'], 404);

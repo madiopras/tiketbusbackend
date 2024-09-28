@@ -11,10 +11,8 @@ class ScheduleResource extends JsonResource
         return [
             'schedule_id' => $this->schedule_id,
             'bus_id' => $this->bus_id,
-            'route_id' => $this->route_id,
             'departure_time' => $this->departure_time,
             'arrival_time' => $this->arrival_time,
-            'price' => $this->price,
             'description' => $this->description,
             'created_by_id' => $this->created_by_id,
             'updated_by_id' => $this->updated_by_id,

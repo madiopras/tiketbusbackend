@@ -16,10 +16,8 @@ class CreateSchedulesTable extends Migration
         Schema::create('schedules', function (Blueprint $table) {
             $table->id('id');
             $table->integer('bus_id');
-            $table->integer('route_id');
             $table->dateTime('departure_time');
             $table->dateTime('arrival_time');
-            $table->decimal('price', 15, 2);
             $table->string('description');
             $table->integer('created_by_id');
             $table->timestamps();
