@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Carbon;
 
 class SpecialDays extends Model
 {
@@ -34,8 +35,8 @@ class SpecialDays extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'start_date' => 'datetime',
-        'end_date' => 'datetime',
+        'start_date' => 'datetime:Y-m-d H:i:s',
+        'end_date' => 'datetime:Y-m-d H:i:s',
         'price_percentage' => 'float',
         'is_increase' => 'boolean',
         'is_active' => 'boolean',
@@ -50,6 +51,17 @@ class SpecialDays extends Model
      * @param array $filters
      * @return \Illuminate\Database\Eloquent\Builder
      */
+
+     public function setStartDateAttribute($value)
+    {
+        $this->attributes['start_date'] = Carbon::parse($value)->setTimezone('Asia/Jakarta');
+    }
+
+    public function setEndDateAttribute($value)
+    {
+        $this->attributes['end_date'] = Carbon::parse($value)->setTimezone('Asia/Jakarta');
+    }
+    
     public function scopeFilter($query, $filters)
     {
         if (isset($filters['name'])) {

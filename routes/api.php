@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\Master\BusesController; // Tambahkan ini
 use App\Http\Controllers\Admin\Master\LocationsController;
 use App\Http\Controllers\Admin\Master\RoutesController;
 use App\Http\Controllers\Admin\Master\SpecialDaysController;
+use App\Http\Controllers\Admin\SchedulesController;
 
 // Register and Login
 Route::post('register', [AuthController::class, 'register']);
@@ -28,5 +29,6 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::apiResource('locations', LocationsController::class); // Tambahkan ini
         Route::apiResource('routes', RoutesController::class); // Tambahkan ini
         Route::apiResource('sdays', SpecialDaysController::class); // Tambahkan ini
+        Route::apiResource('schedules', SchedulesController::class); // Tambahkan ini
     });
 });

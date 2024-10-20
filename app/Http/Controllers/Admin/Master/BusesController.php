@@ -12,26 +12,36 @@ use Illuminate\Http\Request;
 
 class BusesController extends Controller
 {
+    
     public function index(Request $request)
-    {
-        try {
-            $filters = $request->only(['bus_number', 'type_bus', 'class_name', 'bus_name', 'is_active']);
-            $limit = $request->query('limit', 10);
-            $page = $request->query('page', 1);
+{
+    try {
+        $filters = $request->only(['bus_number', 'type_bus', 'class_name', 'bus_name', 'is_active']);
+        $limit = $request->query('limit', 10);
+        $page = $request->query('page', 1);
+        
+        // Tangkap parameter dateTime dari request
+        $dateTime = $request->only(['dateTime']); // Default value jika tidak ada
 
-            $buses = Buses::filterWithJoin($filters)->paginate($limit, ['*'], 'page', $page);
+        // Mengambil data bus dengan filter dan mengecualikan yang ada dalam jadwal
+        $buses = Buses::filterWithJoin($filters)
+                      ->filterBusesNotInSchedule($dateTime)
+                      ->paginate($limit, ['*'], 'page', $page);
 
-            return response()->json([
-                'status' => true,
-                'data' => $buses->items(),
-                'current_page' => $buses->currentPage(),
-                'total_pages' => $buses->lastPage(),
-                'total_items' => $buses->total()
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to fetch buses', 'error' => $e->getMessage()], 500);
-        }
+        return response()->json([
+            'status' => true,
+            'data' => $buses->items(),
+            'current_page' => $buses->currentPage(),
+            'total_pages' => $buses->lastPage(),
+            'total_items' => $buses->total()
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Failed to fetch buses', 'error' => $e->getMessage()], 500);
     }
+}
+
+
+
 
     public function show($id)
     {

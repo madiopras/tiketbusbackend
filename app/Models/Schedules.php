@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Carbon;
 
 class Schedules extends Model
 {
@@ -18,6 +19,7 @@ class Schedules extends Model
      */
 
     protected $fillable = [
+        'location_id',
         'bus_id',
         'departure_time',
         'arrival_time',
@@ -32,8 +34,8 @@ class Schedules extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'departure_time' => 'datetime',
-        'arrival_time' => 'datetime',
+        'departure_time' => 'datetime:Y-m-d H:i:s',
+        'arrival_time' => 'datetime:Y-m-d H:i:s',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -45,34 +47,66 @@ class Schedules extends Model
      * @param array $filters
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeFilter($query, $filters)
-    {
-        if (isset($filters['bus_id'])) {
-            $query->where('bus_id', $filters['bus_id']);
-        }
-        if (isset($filters['departure_time'])) {
-            $query->where('departure_time', '>=', $filters['departure_time']);
-        }
-        if (isset($filters['arrival_time'])) {
-            $query->where('arrival_time', '<=', $filters['arrival_time']);
-        }
-        if (isset($filters['description'])) {
-            $query->where('description', 'like', '%' . $filters['description'] . '%');
-        }
-        if (isset($filters['created_by_id'])) {
-            $query->where('created_by_id', $filters['created_by_id']);
-        }
-        if (isset($filters['updated_by_id'])) {
-            $query->where('updated_by_id', $filters['updated_by_id']);
-        }
-    }
 
+     public function setDepartureTimeAttribute($value)
+     {
+        $this->attributes['departure_time'] = Carbon::parse($value)->setTimezone('Asia/Jakarta');
+     }
+ 
+     public function setArrivalTimeAttribute($value)
+     {
+        $this->attributes['arrival_time'] = Carbon::parse($value)->setTimezone('Asia/Jakarta');
+     }
+
+    // Fungsi scope untuk memfilter data
+    public function scopeFilterWithJoin($query, $filters)
+    {
+        $query->select('schedules.id', 'locations.name', 'schedules.departure_time', 'schedules.arrival_time', 'buses.bus_number', 'buses.bus_name', 'buses.type_bus', 'classes.class_name')
+              ->join('buses', 'buses.id', '=', 'schedules.bus_id')
+              ->join('classes', 'buses.class_id', '=', 'classes.id')
+              ->join('locations', 'schedules.location_id', '=', 'locations.id')
+              ->orderBy('schedules.departure_time', 'asc');
+
+        
+        if (isset($filters['departure_time'])) {
+            $query->where('schedules.departure_time', $filters['departure_time']);
+        }
+        if (isset($filters['bus_number'])) {
+            $query->where('buses.bus_number', 'like', '%' . $filters['bus_number'] . '%');
+        }
+        if (isset($filters['class_name'])) {
+            $query->where('classes.class_name', 'like', '%' . $filters['class_name'] . '%');
+        }
+        if (isset($filters['type_bus'])) {
+            $query->where('buses.type_bus', 'like', '%' . $filters['type_bus'] . '%');
+        }
+        if (isset($filters['bus_name'])) {
+            $query->where('buses.bus_name', 'like', '%' . $filters['bus_name'] . '%');
+        }
+        if (isset($filters['is_active'])) {
+            $isActiveValue = $filters['is_active'] === 'true' ? 1 : ($filters['is_active'] === 'false' ? 0 : '');
+            $query->where('is_active', 'like', '%' . $isActiveValue . '%');
+        }
+        
+        return $query;
+    }
     /**
      * Get the bus associated with the schedule.
      */
-    public function bus()
+
+     public function scheduleRutes()
+     {
+         return $this->hasMany(ScheduleRute::class, 'schedule_id');
+     }
+     
+    public function bus()   
     {
         return $this->belongsTo(Buses::class, 'bus_id');
+    }
+
+    public function class()
+    {
+        return $this->belongsTo(Classes::class, 'class_id');
     }
     /**
      * Get the user who created this schedule.

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Schedules;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateScheduleRequest extends FormRequest
+class UpdateSchedulesRequest extends FormRequest
 {
     public function authorize()
     {
@@ -14,10 +14,11 @@ class UpdateScheduleRequest extends FormRequest
     public function rules()
     {
         return [
+            'location_id' => 'required|integer',
             'bus_id' => 'sometimes|required|integer',
             'departure_time' => 'sometimes|required|date',
             'arrival_time' => 'sometimes|required|date',
-            'description' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|required|string|max:255'
         ];
     }
 }
